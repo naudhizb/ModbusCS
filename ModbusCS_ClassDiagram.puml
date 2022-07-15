@@ -1,0 +1,95 @@
+
+@startuml
+
+scale 1920 width
+
+interface IModbusTransport
+abstract class ModbusTransport
+class ModbusRTUTrasnport
+class ModbusTCPTransport
+class ModbusASCIITransport
+class ModbusQueueRTUTransport
+
+IModbusTransport <|-- ModbusTransport
+ModbusTransport <|-- ModbusRTUTrasnport
+ModbusTransport <|-- ModbusTCPTransport
+ModbusTransport <|-- ModbusASCIITransport
+ModbusRTUTrasnport <|-- ModbusQueueRTUTransport
+
+
+interface IModbusDevice
+interface IModbusMasterDevice
+interface IModbusSlaveDevice
+abstract class ModbusDevice
+class ModbusMasterDevice
+class ModbusSlaveDevice
+class ModbusMasterConverter
+
+IModbusDevice <|-- ModbusDevice
+ModbusDevice <|-- IModbusMasterDevice
+ModbusDevice <|-- IModbusSlaveDevice
+IModbusMasterDevice <|-- ModbusMasterDevice
+IModbusSlaveDevice <|-- ModbusSlaveDevice
+IModbusMasterDevice <|-- ModbusMasterConverter
+
+
+interface IModbusMessage
+interface IModbusRequestMessage
+interface IModbusResponseMessage
+interface IModbusDataMessage
+' interface IModbusObjectMessage
+' interface IModbusExceptionMessage
+class ModbusRequestMessage
+class ModbusResponseMessage
+' class ModbusReadHoldingRequestMessage
+' class ModbusReadHoldingResponseMessage
+' class ModbusWriteHoldingRequestMessage
+' class ModbusWriteHoldingResponseMessage
+' class ModbusReadInputRequestMessage
+' class ModbusReadInputResponseMessage
+' class ModbusWriteCoilRequestMessage
+' class ModbusWriteCoilResponseMessage
+' class ModbusReadCoilRequestMessage
+' class ModbusReadCoilResponseMessage
+' class ModbusReadContactRequestMessage
+' class ModbusReadContactResponseMessage
+
+IModbusMessage <|-- IModbusRequestMessage
+IModbusMessage <|-- IModbusResponseMessage
+IModbusMessage <|-- IModbusDataMessage
+' IModbusMessage <|-- IModbusExceptionMessage
+' IModbusMessage <|-- IModbusObjectMessage
+
+IModbusDataMessage <|-- ModbusRequestMessage
+IModbusDataMessage <|-- ModbusResponseMessage
+IModbusRequestMessage <|-- ModbusRequestMessage
+IModbusResponseMessage <|-- ModbusResponseMessage
+
+' IModbusRequestMessage <|-- ModbusReadHoldingRequestMessage
+' IModbusRequestMessage <|-- ModbusWriteHoldingRequestMessage
+' IModbusRequestMessage <|-- ModbusReadInputRequestMessage
+' IModbusRequestMessage <|-- ModbusWriteCoilRequestMessage
+' IModbusRequestMessage <|-- ModbusReadCoilRequestMessage
+' IModbusRequestMessage <|-- ModbusReadContactRequestMessage
+' IModbusResponseMessage <|-- ModbusReadHoldingResponseMessage
+' IModbusResponseMessage <|-- ModbusWriteHoldingResponseMessage
+' IModbusResponseMessage <|-- ModbusReadInputResponseMessage
+' IModbusResponseMessage <|-- ModbusWriteCoilResponseMessage
+' IModbusResponseMessage <|-- ModbusReadCoilResponseMessage
+' IModbusResponseMessage <|-- ModbusReadContactResponseMessage
+
+interface IModbusDataStore
+class DataStore
+class CachedDataStore
+
+IModbusDataStore <|-- DataStore
+DataStore <|-- CachedDataStore
+
+ModbusSlaveDevice *-- IModbusDataStore
+ModbusDevice *-- ModbusTransport
+
+class DeviceManager
+class WaveCollector
+
+
+@enduml
