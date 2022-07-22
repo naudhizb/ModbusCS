@@ -30,14 +30,17 @@ namespace ModbusCS
     {
         static void Main(string[] args)
         {
-            SerialMain(args);
+            //SerialMain(args);
+            GatewayMain(args);
         }
         static void GatewayMain(string[] args)
         {
             TcpListener Listener = null;
             TcpClient client = null;
-
-            int PORT = 5555;
+            string SerialPortName = "COM4";
+            int SerialBaudrate = 38400;
+            ModbusMasterRTU Ch1 = new ModbusMasterRTU(1, SerialPortName, SerialBaudrate);
+            int PORT = 502;
 
             Console.WriteLine("서버소켓");
             try
@@ -47,11 +50,9 @@ namespace ModbusCS
 
                 while (true)
                 {
-                   // client =
-                   //Listener.AcceptTcpClient();
-                   // Receiver r = new Receiver();
-
-                   // r.startClient(client);
+                    client = Listener.AcceptTcpClient();
+                    ModbusBypassTCPSlave r = new ModbusBypassTCPSlave(client, Ch1);
+                    r.Run_Server();
 
                 }
             }

@@ -11,13 +11,13 @@ using System.IO;
 /*
  *                   << Modbus General Frame >> 
  *                   
- *                        |                  Modbus RTU ADU                   |
- *                        |<------------------------------------------------->|
- *                        |                                                   |
- *                        +------------+----------+-------------------+-------+
- *                        | Additional | Function |      Data ...     | Error |
- *                        |   Address  |   Code   |                   | Check |
- *                        +------------+----------+-------------------+-------+
+ *                           |               Modbus RTU ADU                   |
+ *                           |<---------------------------------------------->|
+ *                           |                                                |
+ *                           +---------+----------+-------------------+-------+
+ *                           |  Slave  | Function |      Data ...     | Error |
+ *                           | Address |   Code   |                   | Check |
+ *                           +---------+----------+-------------------+-------+
  *                                     |                              |
  *                                     |<---------------------------->|
  *                                     |         Modbus PDU           |
@@ -45,7 +45,7 @@ namespace ModbusCS
     }
     public abstract class ModbusTransport : IModbusTrasnport
     {
-        protected object Lock;
+        protected object Lock = new object();
         public const int EXCEPTION_SUCCESS = 0;
         public const int EXCEPTION_TIMEOUT = -1;
         public const int EXCEPTION_CRC_ERROR = -2;
@@ -124,7 +124,7 @@ namespace ModbusCS
 
         public ModbusTransportRTU(int index, string portname, int baudrate = 38400)
         {
-            this.Lock = new object();
+            //this.Lock = new object();
             this.index = index;
             PortName = portname;
             sport = new SerialPortExtension(PortName, baudrate, Parity.None, 8, StopBits.One);
@@ -489,6 +489,7 @@ namespace ModbusCS
     {
         public TcpClient client;
         protected NetworkStream NS = null;
+        const int ADU_Length = 7;
 
         public ModbusTransportTCP(TcpClient client)
         {
@@ -572,7 +573,7 @@ namespace ModbusCS
         }
         public override byte[] ADUtoPDU(byte[] ModbusADU)
         {
-            byte[] ModbusPDU = ModbusADU.Skip(6).ToArray();
+            byte[] ModbusPDU = ModbusADU.Skip(ADU_Length).ToArray();
             if(ModbusADU[5] != ModbusPDU.Length + 1)
             {
                 throw new Exception("Invalid Modbus ADU");
@@ -581,7 +582,7 @@ namespace ModbusCS
         }
         public override byte[] GetADUContext(byte[] ModbusADU)
         {
-            byte[] ADUContext = ModbusADU.Take(6).ToArray();
+            byte[] ADUContext = ModbusADU.Take(ADU_Length).ToArray();
             if(ModbusADU[2] != 0x00 && ModbusADU[3] != 0x00)
             {
                 throw new Exception("Invalid Modbus ADU");

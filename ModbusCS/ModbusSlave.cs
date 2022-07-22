@@ -75,10 +75,20 @@ namespace ModbusCS
                     continue;
                 }
                 byte[] ADUContext = GetADUContext(RxFrame);
-                byte[] RxPDU = ADUtoPDU(RxFrame);
-                byte[] TxPDU = ProcessFrame(RxPDU);
-                byte[] TxFrame = PDUtoADU(ADUContext, TxPDU);
-                TransmitFrame(TxFrame);
+                // byte[] BypassADU = RxFrame.Skip(6).Take(ADUContext[5]).ToArray();
+                byte[] BypassPDU = ADUtoPDU(RxFrame);
+                byte[] Response = null;
+                try{
+                    status = bypass.ModbusBypass(ADUContext[6], BypassPDU, out Response);
+                    if(Response != null){
+                        byte[] TxFrame = ADUContext.Take(6).Concat(Response.AsEnumerable()).ToArray();
+                        TransmitFrame(TxFrame);
+                    }
+                }
+                catch
+                {
+                    
+                }
             }
         }
         public ModbusBypassTCPSlave(TcpClient client, ModbusMasterRTU bypass) : base(client)
